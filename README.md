@@ -1,4 +1,4 @@
-# Nidaan 
+# Nidaan - Patient Case Taking Software
 
 ### Digital Patient Intake & Doctor Consultation System
 
