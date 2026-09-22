@@ -1,0 +1,28 @@
+{
+  "name": "nidaan-patient-intake-kiosk",
+  "private": true,
+  "version": "1.0.0",
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n FRONTEND,BACKEND -c auto \"npm run dev --workspace frontend\" \"npm run dev --workspace backend\"",
+    "dev:frontend": "npm run dev --workspace frontend",
+    "dev:backend": "npm run dev --workspace backend",
+    "build": "npm run build --workspace frontend",
+    "start:backend": "npm run start --workspace backend",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:logs": "docker compose logs -f db",
+    "prisma:generate": "npm run prisma:generate --workspace backend",
+    "db:push": "npm run db:push --workspace backend",
+    "db:remove-ramesh": "npm run db:remove-ramesh --workspace backend"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.2"
+  }
+}

@@ -1,0 +1,84 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Session {
+  id               Int             @id @default(autoincrement())
+  token            String          @unique
+  channel          String
+  helperName       String?         @map("helper_name")
+  helperId         String?         @map("helper_id")
+  patientName      String?         @map("patient_name")
+  abhaId           String?         @map("abha_id")
+  abhaLinkConsent  Boolean         @default(false) @map("abha_link_consent")
+  shareConsent     Boolean         @default(false) @map("share_consent")
+  chiefComplaint   String?         @map("chief_complaint")
+  fieldsJson       Json            @default("{}") @map("fields_json")
+  ayushFlagged     Boolean         @default(false) @map("ayush_flagged")
+  ayushFieldsJson  Json            @default("{}") @map("ayush_fields_json")
+  docSummary       String?         @map("doc_summary")
+  documents        Document[]
+  redFlagTriggered Boolean         @default(false) @map("red_flag_triggered")
+  redFlagResult    String?         @map("red_flag_result")
+  fhirBundleJson   Json?           @map("fhir_bundle_json")
+  createdAt        DateTime        @default(now()) @map("created_at")
+  redFlagEvents    RedFlagEvent[]
+
+  @@map("sessions")
+}
+
+model RedFlagEvent {
+  id           Int      @id @default(autoincrement())
+  sessionToken String   @map("session_token")
+  triggered    Boolean
+  confirmed    Boolean?
+  createdAt    DateTime @default(now()) @map("created_at")
+  session      Session  @relation(fields: [sessionToken], references: [token], onDelete: Cascade)
+
+  @@map("red_flag_events")
+}
+
+
+model SyntheticPatient {
+  id           Int      @id @default(autoincrement())
+  abhaId       String   @unique @map("abha_id")
+  abhaAddress  String   @unique @map("abha_address")
+  name         String
+  dob          DateTime
+  gender       String
+  mobile       String
+  address      String
+  district     String
+  state        String
+  pincode      String
+  bloodGroup   String?  @map("blood_group")
+  createdAt    DateTime @default(now()) @map("created_at")
+
+  @@map("synthetic_patients")
+}
+
+
+model Document {
+  id           String   @id @default(uuid())
+  uploadToken  String?  @map("upload_token")
+  sessionToken String?  @map("session_token")
+  name         String
+  type         String
+  size         Int
+  storagePath  String   @map("storage_path")
+  uploadedAt   DateTime @default(now()) @map("uploaded_at")
+  ocrStatus    String   @default("pending") @map("ocr_status")
+  ocrJson      Json?    @map("ocr_json")
+  ocrError     String?  @map("ocr_error")
+
+  session      Session? @relation(fields: [sessionToken], references: [token], onDelete: Cascade)
+
+  @@index([uploadToken])
+  @@index([sessionToken])
+  @@map("documents")
+}

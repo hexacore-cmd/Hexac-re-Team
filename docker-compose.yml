@@ -1,0 +1,27 @@
+services:
+  db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: nidaan
+      POSTGRES_USER: nidaan
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5435:5432"
+    volumes:
+      - nidaan_kiosk_pgdata:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U nidaan -d nidaan"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  ocr:
+    build: ./ocr-service
+    restart: unless-stopped
+    ports:
+      - "8000:8000"
+
+volumes:
+  nidaan_kiosk_pgdata:
